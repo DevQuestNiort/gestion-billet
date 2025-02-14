@@ -1,0 +1,10 @@
+{
+    "name": "cloud-run-datastore",
+    "version": "1.0.0",
+    "dependencies": {
+        "@google-cloud/functions-framework": "^3.0.0",
+        "@google-cloud/datastore": "^9.2.1",
+        "@google-cloud/secret-manager": "5.6.0",
+        "node-fetch": "^2.6.7"
+    }
+}
