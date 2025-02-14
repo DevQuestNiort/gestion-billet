@@ -36,6 +36,6 @@ jobs:
       - name: Apply Terraform
         env:
           TF_VAR_gcp_project_name: ${{ vars.GCP_PROJECT_NAME }}
-          TF_VAR_gcp_project_id: ${{ secret.GCP_PROJECT_ID }}
+          TF_VAR_gcp_project_id: ${{ secrets.GCP_PROJECT_ID }}
           TF_VAR_gcp_region: ${{ vars.GCP_REGION }}
         run: terraform apply -auto-approve

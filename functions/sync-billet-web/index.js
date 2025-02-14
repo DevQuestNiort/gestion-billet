@@ -12,7 +12,7 @@ functions.http('syncBilletWeb', async (req, res) => {
   const secretmanagerClient = new SecretManagerServiceClient();
   const [billet_web_token] = await secretmanagerClient.accessSecretVersion({name: BILLET_WEB_SECRET_NAME})
 
-  const response = await fetch("https://www.billetweb.fr/api/event/1220831/attendees", {
+  const response = await fetch("https://www.billetweb.fr/api/event/1220831/attendees?since=120", {
       method: "GET",
       headers: {
         "Authorization": `Basic ${billet_web_token.payload.data.toString('utf8')}`,
