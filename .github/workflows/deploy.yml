@@ -29,9 +29,11 @@ jobs:
 
       - name: Initialize Terraform
         run: terraform init
+        working-directory: infrastructure
 
       - name: Validate Terraform
         run: terraform validate
+        working-directory: infrastructure
 
       - name: Apply Terraform
         env:
@@ -39,3 +41,4 @@ jobs:
           TF_VAR_gcp_project_id: ${{ secrets.GCP_PROJECT_ID }}
           TF_VAR_gcp_region: ${{ vars.GCP_REGION }}
         run: terraform apply -auto-approve
+        working-directory: infrastructure
