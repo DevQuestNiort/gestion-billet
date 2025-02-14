@@ -12,7 +12,7 @@ functions.http('syncBilletWeb', async (req, res) => {
   const secretmanagerClient = new SecretManagerServiceClient();
   const [billet_web_token] = await secretmanagerClient.accessSecretVersion({name: BILLET_WEB_SECRET_NAME})
 
-  const response = await fetch("https://www.billetweb.fr/api/event/1220831/attendees?since=120", {
+  const response = await fetch("https://www.billetweb.fr/api/event/1220831/attendees", {
       method: "GET",
       headers: {
         "Authorization": `Basic ${billet_web_token.payload.data.toString('utf8')}`,
@@ -53,7 +53,10 @@ functions.http('syncBilletWeb', async (req, res) => {
     const [commande] = await datastore.get(acheteurKey);
 
     if (commande) {
-      commande.tickets = [... new Set([...commandeByAcheteur[acheteur].tickets, ...commande.tickets])]
+      // supprime les doublons
+      commande.tickets = [...new Map(
+        [...commandeByAcheteur[acheteur].tickets, ...commande.tickets].map(ticket => [ticket.ticket_id, ticket])
+      ).values()]
       await datastore.save({key: acheteurKey, data: commande})
     } else {
       await datastore.save({key: acheteurKey, data: commandeByAcheteur[acheteur]})
