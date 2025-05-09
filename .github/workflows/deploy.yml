@@ -1,5 +1,7 @@
 name: Terraform Deploy
 
+if: false
+
 on:
   push:
     branches:
@@ -26,6 +28,12 @@ jobs:
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+
+      - name: Build Docker image for App
+        run: |
+          IMAGE_NAME=gcr.io/${{ secrets.GCP_PROJECT_ID }}/billetterie-app
+          docker build -t $IMAGE_NAME ./app
+          docker push $IMAGE_NAME
 
       - name: Initialize Terraform
         run: terraform init

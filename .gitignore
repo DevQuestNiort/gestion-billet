@@ -1,3 +1,5 @@
 infrastructure/terraform.tfvars
 infrastructure/.terraform/
 **/**/node_modules/
+
+**/.env

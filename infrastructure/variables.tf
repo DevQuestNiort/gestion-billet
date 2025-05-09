@@ -13,3 +13,8 @@ variable "gcp_project_id" {
   type        = string
   description = "GCP project ID"
 }
+
+variable "app_image_url" {
+  type = string
+  description = "App image url"
+}

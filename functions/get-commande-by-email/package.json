@@ -1,0 +1,10 @@
+{
+    "name": "get-commande-by-email",
+    "version": "1.0.0",
+    "dependencies": {
+        "@google-cloud/datastore": "^9.2.1",
+        "@google-cloud/functions-framework": "^3.0.0",
+        "@google-cloud/secret-manager": "^6.0.1",
+        "node-mailjet": "^6.0.8"
+    }
+}

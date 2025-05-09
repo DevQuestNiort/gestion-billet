@@ -1,0 +1,112 @@
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #f1ddb6;
+  font-family: 'Teko', sans-serif;
+  font-size: 1.2rem;
+}
+
+nav {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  background-color: #360362;
+  border-bottom: 1px solid #fff;
+  padding: .5rem 0;
+  text-decoration: none;
+  font-size: 2rem;
+  color: #fff;
+}
+
+.info {
+  padding-top: 1rem;
+  padding-left: 1rem;
+  font-style: italic;
+  font-size: 2.5rem;
+  display: flex;
+  justify-content: center;
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
+}
+
+form {
+  display: flex;
+  gap: 1rem;
+  flex-direction: column;
+}
+
+input[type="email"] {
+  padding: 0.5rem;
+  font-size: 1rem;
+  flex: 1;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+button {
+  border: 2px solid #efbfb7;
+  background-color: #360362;
+  color: #efbfb7;
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+button:disabled {
+  background-color: #6b4e84;
+  color: #d8c3d5;
+  border: 2px solid #d8c3d5;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.send-button {
+  padding: 0.5rem;
+}
+
+.spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  animation: spin 1s linear infinite;
+  margin-top: 1rem;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+table {
+  margin: 2rem auto;
+  width: 80%;
+  border-collapse: collapse;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+}
+
+table th,
+table td {
+  border: none;
+  padding: 0.5rem;
+  text-align: left;
+}
+
+table tr:not(:last-child) {
+  border-bottom: 1px solid black;
+}
+
+table input {
+  width: 100%;
+  padding: 0.4rem;
+  box-sizing: border-box;
+  font-size: 1rem;
+  border: none;
+}

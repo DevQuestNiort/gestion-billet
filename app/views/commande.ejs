@@ -1,0 +1,36 @@
+<div>
+  <div class="info">Attention la génération du billet est définitive.</div>
+  <table border="1">
+    <tr>
+      <th></th>
+      <th>Type</th>
+      <th>Nom</th>
+      <th>Prénom</th>
+      <th>Email</th>
+      <th></th>
+  </tr>
+    <% tickets.forEach((ticket, index) => { %>
+      <tr>
+        <td><%= ticket.ticket_id %></td>
+        <td><%= ticket.type %></td>
+        <td><input type="text" name="lastname" value="<%= ticket.lastname %>" required <%= ticket.generated ? 'disabled' : '' %> form="form-<%= ticket.ticket_id %>"/></td>
+        <td><input type="text" name="firstname" value="<%= ticket.firstname %>" required <%= ticket.generated ? 'disabled' : '' %> form="form-<%= ticket.ticket_id %>"/> </td>
+        <td><input type="email" name="email" value="<%= ticket.email %>" required <%= ticket.generated ? 'disabled' : '' %> form="form-<%= ticket.ticket_id %>"/></td>
+        <td>
+          <% if (ticket.generated) { %>
+            <div>Votre place vous a été envoyé par mail</div>
+          <% } else { %>
+            <form id="form-<%= ticket.ticket_id %>" 
+                  hx-post="/<%= encodeURIComponent(commandId) %>/ticket/<%= ticket.ticket_id %>"
+                  hx-swap="outerHTML"
+                  hx-target="closest tr"
+                  hx-on="htmx:beforeRequest:this.innerHTML='<div class=\'spinner\'></div>'">
+              <input type="hidden" name="type" type="text" value="<%= ticket.type %>"/>
+              <button type="submit" <%= ticket.generated ? 'disabled' : '' %> >Générer le billet</button>
+            </form>
+          <% } %>
+        </td>
+      </tr>
+    <% }) %>
+  </table>
+</div>
