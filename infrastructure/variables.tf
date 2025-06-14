@@ -18,3 +18,8 @@ variable "app_image_url" {
   type = string
   description = "App image url"
 }
+
+variable "app_url" {
+  type        = string
+  description = "URL publique de l'application Cloud Run (ex: https://mon-app-xxxx.a.run.app)"
+}

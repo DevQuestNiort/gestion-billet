@@ -60,10 +60,6 @@ resource "google_storage_bucket" "function_bucket" {
 
 variable "functions" {
   default = {
-    sync_billet_web     = "sync-billet-web"
-    get_commande_detail = "get-commande-detail"
-    get_commande_by_email = "get-commande-by-email"
-    update_billet_detail = "update-billet-detail"
     split_ticket = "split-ticket"
   }
 }
@@ -80,86 +76,6 @@ resource "google_storage_bucket_object" "functions" {
   name     = "${each.value}.zip"
   bucket   = google_storage_bucket.function_bucket.name
   source   = data.archive_file.functions[each.key].output_path
-}
-
-resource "google_cloudfunctions2_function" "sync_billet_web_function" {
-  name        = "sync-billet-web-function"
-  project     = var.gcp_project_name
-  location    = var.gcp_region
-  description = "Function used to synchronise BilletWeb to DataStore"
-
-  build_config {
-    runtime     = "nodejs22"
-    entry_point = "syncBilletWeb" # Set the entry point
-    source {
-      storage_source {
-        bucket = google_storage_bucket.function_bucket.name
-        object = google_storage_bucket_object.functions["sync_billet_web"].name
-      }
-    }
-  }
-  service_config {
-    max_instance_count = 1
-    available_memory   = "256M"
-    timeout_seconds    = 60
-    service_account_email = google_service_account.accounts["function_account"].email
-    environment_variables = {
-      GCP_PROJECT_ID = var.gcp_project_id
-      GCP_PROJECT_NAME = var.gcp_project_name
-      GCP_REGION = var.gcp_region
-    }
-  }
-}
-
-resource "google_cloudfunctions2_function" "get_commande_detail_function" {
-  name        = "get_commande_detail-function"
-  project     = var.gcp_project_name
-  location    = var.gcp_region
-  description = "Function used to synchronise BilletWeb to DataStore"
-
-  build_config {
-    runtime     = "nodejs22"
-    entry_point = "getCommandDetails" # Set the entry point
-    source {
-      storage_source {
-        bucket = google_storage_bucket.function_bucket.name
-        object = google_storage_bucket_object.functions["get_commande_detail"].name
-      }
-    }
-  }
-  service_config {
-    max_instance_count = 1
-    available_memory   = "256M"
-    timeout_seconds    = 60
-    service_account_email = google_service_account.accounts["function_account"].email
-  }
-}
-
-resource "google_cloudfunctions2_function" "update_billet_detail_function" {
-  name        = "update_billet_detail-function"
-  project     = var.gcp_project_name
-  location    = var.gcp_region
-  description = "Function used to synchronise BilletWeb to DataStore"
-
-  build_config {
-    runtime     = "nodejs22"
-    entry_point = "updateBilletDetail" # Set the entry point
-    source {
-      storage_source {
-        bucket = google_storage_bucket.function_bucket.name
-        object = google_storage_bucket_object.functions["update_billet_detail"].name
-      }
-    }
-  }
-  service_config {
-    max_instance_count = 1
-    available_memory   = "256M"
-    timeout_seconds    = 60
-    service_account_email = google_service_account.accounts["function_account"].email
-    environment_variables = {
-      GCP_PROJECT_ID = var.gcp_project_id
-    }
-  }
 }
 
 resource "google_cloudfunctions2_function" "split_ticket_function" {
@@ -189,36 +105,6 @@ resource "google_cloudfunctions2_function" "split_ticket_function" {
   }
 }
 
-
-resource "google_cloudfunctions2_function" "get_commande_by_email" {
-  name        = "get_commande_by_email-function"
-  project     = var.gcp_project_name
-  location    = var.gcp_region
-  description = "Function used to synchronise BilletWeb to DataStore"
-
-  build_config {
-    runtime     = "nodejs22"
-    entry_point = "getCommandByEmail" # Set the entry point
-    source {
-      storage_source {
-        bucket = google_storage_bucket.function_bucket.name
-        object = google_storage_bucket_object.functions["get_commande_by_email"].name
-      }
-    }
-  }
-  service_config {
-    max_instance_count = 1
-    available_memory   = "256M"
-    timeout_seconds    = 60
-    service_account_email = google_service_account.accounts["function_account"].email
-    environment_variables = {
-      GCP_PROJECT_ID = var.gcp_project_id
-    }
-  }
-}
-
-
-
 # Schedule trigger for billet sync
 resource "google_cloudfunctions2_function_iam_member" "scheduler_invoker" {
   project        = var.gcp_project_name
@@ -230,21 +116,20 @@ resource "google_cloudfunctions2_function_iam_member" "scheduler_invoker" {
 
 resource "google_cloud_scheduler_job" "sync_billet_web_scheduler" {
   name        = "sync-billet-web-scheduler"
-  description = "Schedule the HTTPS trigger for cloud function"
+  description = "Schedule the HTTPS trigger for billet sync sur l'app"
   schedule    = "0 * * * *"
   project     = var.gcp_project_name
   region      = var.gcp_region
 
   http_target {
-    uri         = google_cloudfunctions2_function.sync_billet_web_function.service_config[0].uri
+    uri         = "${var.app_url}/sync-billet-web"
     http_method = "POST"
     oidc_token {
-      audience              = "${google_cloudfunctions2_function.sync_billet_web_function.service_config[0].uri}/"
+      audience              = var.app_url
       service_account_email = google_service_account.accounts["scheduler_account"].email
     }
   }
 }
-
 
 # Application
 
@@ -292,7 +177,7 @@ resource "google_cloud_run_service_iam_member" "noauth" {
 }
 
 resource "google_cloud_run_domain_mapping" "app_domain" {
-  name     = "billetterie.devquest.fr"
+  name     = replace(var.app_url, "https://", "")
   location = var.gcp_region
   metadata {
     namespace = var.gcp_project_id
@@ -300,5 +185,4 @@ resource "google_cloud_run_domain_mapping" "app_domain" {
   spec {
     route_name = google_cloud_run_service.app.name
   }
-
 }

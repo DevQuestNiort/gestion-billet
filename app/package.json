@@ -2,14 +2,31 @@
     "name": "htmx-app",
     "version": "1.0.0",
     "type": "module",
+    "main": "dist/server.js",
     "scripts": {
-        "start": "node server.js"
+        "dev": "node --loader ts-node/esm src/server.ts",
+        "build": "tsc",
+        "start": "node dist/server.js",
+        "test": "vitest"
     },
     "dependencies": {
+        "@google-cloud/datastore": "^9.2.1",
+        "@google-cloud/secret-manager": "^6.0.1",
         "dotenv": "^16.4.7",
         "ejs": "^3.1.9",
         "express": "^4.18.2",
         "google-auth-library": "^9.15.1",
-        "node-fetch": "^2.6.7"
+        "node-fetch": "^2.6.7",
+        "node-mailjet": "^6.0.8"
+    },
+    "devDependencies": {
+        "@types/ejs": "^3.1.5",
+        "@types/express": "^5.0.3",
+        "@types/node": "^22.15.31",
+        "@types/node-fetch": "^2.6.12",
+        "@vitest/ui": "^2.1.9",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.8.3",
+        "vitest": "^2.1.9"
     }
 }

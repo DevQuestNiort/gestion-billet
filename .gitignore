@@ -3,3 +3,6 @@ infrastructure/.terraform/
 **/**/node_modules/
 
 **/.env
+*.sh
+
+**/dist/
