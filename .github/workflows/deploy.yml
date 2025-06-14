@@ -1,7 +1,4 @@
 name: Terraform Deploy
-
-if: false
-
 on:
   push:
     branches:
@@ -19,6 +16,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Install dependencies
+        run: npm ci
+        working-directory: app
+
+      - name: Build TypeScript
+        run: npm run build
+        working-directory: app
+
+      - name: Run tests
+        run: npm test
+        working-directory: app
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
@@ -28,12 +37,22 @@ jobs:
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+      
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+  
+      - name: Configure Docker for Artifact Registry
+        run: |
+          gcloud auth configure-docker europe-west9-docker.pkg.dev
+  
 
       - name: Build Docker image for App
         run: |
-          IMAGE_NAME=gcr.io/${{ secrets.GCP_PROJECT_ID }}/billetterie-app
+          IMAGE_TAG=${{ github.sha }}
+          IMAGE_NAME=europe-west9-docker.pkg.dev/${{ vars.GCP_PROJECT_NAME }}/devquest-registry/billetterie-app:$IMAGE_TAG
           docker build -t $IMAGE_NAME ./app
           docker push $IMAGE_NAME
+          echo "IMAGE_URL=$IMAGE_NAME" >> $GITHUB_ENV
 
       - name: Initialize Terraform
         run: terraform init
@@ -48,5 +67,7 @@ jobs:
           TF_VAR_gcp_project_name: ${{ vars.GCP_PROJECT_NAME }}
           TF_VAR_gcp_project_id: ${{ secrets.GCP_PROJECT_ID }}
           TF_VAR_gcp_region: ${{ vars.GCP_REGION }}
+          TF_VAR_app_image_url: ${{ env.IMAGE_URL }}
+          TF_VAR_app_url: https://billetterie.devquest.fr
         run: terraform apply -auto-approve
         working-directory: infrastructure
